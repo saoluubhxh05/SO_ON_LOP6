@@ -291,6 +291,7 @@ details.q p{margin:8px 0 0;color:var(--patina)}
     </div>
     <div id="importOut"></div>
     <div class="row" id="dataActs"></div>
+    <div id="syncBox" style="display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:12px"></div>
   </section>
 
   <section id="pickBox" class="card pickbox" hidden aria-label="Xem và chọn dòng"></section>
@@ -351,8 +352,10 @@ const SKEY = "so-on-su-dia-6";
 let S = {stars:0, streak:1, lastDay:null, cards:{}, off:{}, ma:"SU-C5-B14", mode:"hieu"};
 try { const raw = localStorage.getItem(SKEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e){}
 if (!S.off || typeof S.off !== "object") S.off = {};
+const T0 = S.t || 0;
+let syncReady = false, pushTimer = 0;
 const OFF = id => !!S.off[id];
-const save = () => { try { localStorage.setItem(SKEY, JSON.stringify(S)); } catch(e){} };
+const save = () => { S.t = Date.now(); try { localStorage.setItem(SKEY, JSON.stringify(S)); } catch(e){} schedulePush(); };
 (function streak(){
   const t = today();
   if (S.lastDay === null) S.streak = 1;
@@ -1123,6 +1126,169 @@ loadSaved().then(async v => {
   }
   if (v && v.D && v.D.catalog){ META = v.meta || {src:"saved", file:"(không rõ)"}; useData(v.D); if (!$("#dataBox").hidden) drawDataBox(); }
 });
+
+/* ================= SAO LƯU & ĐỒNG BỘ TIẾN ĐỘ ================= */
+const SYKEY = "so-on-lop6-sync";
+const CODE_OK = c => /^[A-Za-z0-9_-]{6,40}$/.test(c || "");
+const URL_OK = u => /^https:\/\/script\.google(usercontent)?\.com\//.test(u || "");
+let SY = {};
+try { SY = JSON.parse(localStorage.getItem(SYKEY) || "{}") || {}; } catch(e){ SY = {}; }
+const saveSY = () => { try { localStorage.setItem(SYKEY, JSON.stringify(SY)); } catch(e){} };
+(function fromHash(){
+  const m = location.hash.match(/sync=([^&]+)/);
+  if (!m) return;
+  try {
+    const p = decodeURIComponent(m[1]).split("|");
+    if (URL_OK(p[0]) && CODE_OK(p[1])){ SY = {url:p[0], code:p[1], base:0}; saveSY(); }
+  } catch(e){}
+  try { history.replaceState(null, "", location.pathname + location.search); } catch(e){}
+})();
+let syncMsg = "";
+function setSyncMsg(m){ syncMsg = m; const el = $("#syncMsg"); if (el) el.innerHTML = m; }
+function mergeS(a, b){
+  const n = (b.t || 0) > (a.t || 0) ? b : a;
+  const o = Object.assign({}, a, b);
+  o.ma = n.ma || a.ma; o.mode = n.mode || a.mode;
+  o.off = Object.assign({}, n.off || {});
+  o.stars = Math.max(a.stars || 0, b.stars || 0);
+  if ((a.lastDay || 0) !== (b.lastDay || 0)){ const x = (a.lastDay || 0) > (b.lastDay || 0) ? a : b; o.lastDay = x.lastDay; o.streak = x.streak || 1; }
+  else { o.lastDay = a.lastDay; o.streak = Math.max(a.streak || 1, b.streak || 1); }
+  o.cards = Object.assign({}, a.cards || {});
+  const bc = b.cards || {};
+  for (const id in bc){
+    const p = o.cards[id], q = bc[id];
+    if (!p || (q.due || 0) > (p.due || 0) || ((q.due || 0) === (p.due || 0) && (q.box || 0) > (p.box || 0))) o.cards[id] = q;
+  }
+  o.t = Date.now();
+  return o;
+}
+function refreshTop(){
+  try { $("#stars").textContent = S.stars; } catch(e){}
+  try { const s = $("#streak"); if (s) s.textContent = S.streak; } catch(e){}
+}
+function adopt(o, full){
+  Object.keys(S).forEach(k => { if (!(k in o)) delete S[k]; });
+  Object.assign(S, o);
+  if (!S.off || typeof S.off !== "object") S.off = {};
+  if (!S.cards || typeof S.cards !== "object") S.cards = {};
+  try { localStorage.setItem(SKEY, JSON.stringify(S)); } catch(e){}
+  refreshTop();
+  if (full){ try { syncNav(); render(); } catch(e){} }
+}
+async function pullRemote(){
+  const r = await fetch(SY.url + (SY.url.includes("?") ? "&" : "?") + "code=" + encodeURIComponent(SY.code) + "&_=" + Date.now(), {cache:"no-store"});
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.err === "ma" ? "Mã đồng bộ không hợp lệ" : (j.err || "lỗi máy chủ"));
+  return j.data || null;
+}
+let pushing = false, pushAgain = false;
+async function pushNow(full){
+  if (!SY.url || !SY.code) return;
+  if (pushing){ pushAgain = true; return; }
+  pushing = true;
+  try {
+    const r = await fetch(SY.url, {method:"POST", body:JSON.stringify({code:SY.code, base:SY.base || 0, data:S})});
+    const j = await r.json();
+    if (j.ok){ SY.base = j.t || S.t; SY.last = Date.now(); saveSY(); setSyncMsg(`Đã lưu lên mạng lúc ${esc(fmtTime(SY.last))}.`); }
+    else if (j.err === "cu" && j.data){
+      adopt(mergeS(S, j.data), full); SY.base = j.data.t || 0; saveSY();
+      pushing = false; return pushNow(full);
+    } else setSyncMsg(`<span style="color:var(--bad)">Chưa lưu lên mạng được: ${esc(j.err || "lỗi")}.</span>`);
+  } catch(e){
+    setSyncMsg(`<span style="color:var(--bad)">Chưa lưu lên mạng được (mất mạng?). App sẽ thử lại ở lần lưu sau.</span>`);
+  }
+  pushing = false;
+  if (pushAgain){ pushAgain = false; pushNow(full); }
+}
+function schedulePush(){
+  if (!syncReady || !SY.url) return;
+  clearTimeout(pushTimer); pushTimer = setTimeout(() => pushNow(false), 2500);
+}
+async function syncStart(full){
+  if (!SY.url || !SY.code){ syncReady = true; return; }
+  setSyncMsg("Đang lấy tiến độ trên mạng…");
+  try {
+    const d = await pullRemote();
+    syncReady = true;
+    if (d && (d.t || 0) > (SY.base || 0)){
+      adopt(T0 || Object.keys(S.cards).length || S.stars ? mergeS(S, d) : Object.assign({}, d, {t:Date.now()}), full);
+      SY.base = d.t || 0; saveSY();
+      await pushNow(full);
+    } else if (!d || (S.t || 0) > (SY.base || 0)) await pushNow(full);
+    else { SY.last = Date.now(); saveSY(); setSyncMsg(`Đã khớp với bản trên mạng lúc ${esc(fmtTime(SY.last))}.`); }
+  } catch(e){
+    syncReady = true;
+    setSyncMsg(`<span style="color:var(--bad)">Không lấy được tiến độ trên mạng: ${esc(e.message || e)}. Con vẫn học bình thường, app sẽ lưu lại sau.</span>`);
+  }
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && syncReady && SY.url) syncStart(false); });
+
+function backupName(){ const d = new Date(); const p = n => String(n).padStart(2, "0"); return `so-on-lop6_tien-do_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.json`; }
+function downloadBackup(){
+  const blob = new Blob([JSON.stringify({app:"so-on-lop6", v:1, time:Date.now(), S}, null, 1)], {type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = backupName();
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+const newCode = () => { const c = "abcdefghjkmnpqrstuvwxyz23456789"; let s = ""; const r = crypto.getRandomValues(new Uint8Array(10)); r.forEach(x => s += c[x % c.length]); return s; };
+function quickLink(){ return location.origin + location.pathname + "#sync=" + encodeURIComponent(SY.url + "|" + SY.code); }
+function drawSync(){
+  const box = $("#syncBox"); if (!box) return;
+  const nCards = Object.keys(S.cards || {}).length;
+  let h = `<div class="eyebrow">Tiến độ của con</div>
+    <p class="muted" style="margin:0;font-size:.92rem">Gồm: ${S.stars} sao, chuỗi ${S.streak} ngày, ${nCards} thẻ nhớ đã học, các câu đã bỏ chọn. Tiến độ nằm trong trình duyệt của máy này.</p>
+    <div class="row" style="flex-wrap:wrap;gap:10px">
+      <button class="btn soft" id="bkDown">Tải file sao lưu</button>
+      <label for="bkIn" class="btn ghost">Khôi phục từ file</label>
+      <input id="bkIn" type="file" accept=".json,application/json" class="vh">
+    </div>
+    <div class="eyebrow" style="margin-top:6px">Đồng bộ tự động qua Google</div>`;
+  if (SY.url && SY.code){
+    h += `<p style="margin:0">Đang <b>bật</b> với mã <b>${esc(SY.code)}</b>. Máy nào dùng cùng mã sẽ có cùng tiến độ.</p>
+      <div class="row" style="flex-wrap:wrap;gap:10px">
+        <button class="btn soft" id="syNow">Đồng bộ ngay</button>
+        <button class="btn ghost" id="syLink">Sao chép link cài nhanh</button>
+        <button class="btn ghost" id="syOff">Tắt trên máy này</button>
+      </div>
+      <input id="syLinkTxt" readonly hidden style="width:100%;padding:8px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:.85rem">`;
+  } else {
+    h += `<p class="muted" style="margin:0;font-size:.92rem">Dán địa chỉ Web App (Google Apps Script) và một mã đồng bộ. Dùng cùng mã trên mọi máy của con.</p>
+      <label style="display:flex;flex-direction:column;gap:4px;font-weight:600">Địa chỉ Web App
+        <input id="syUrl" placeholder="https://script.google.com/macros/s/…/exec" style="padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit"></label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-weight:600">Mã đồng bộ (6–40 chữ/số, không dấu)
+        <span style="display:flex;gap:8px"><input id="syCode" style="flex:1;min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;font:inherit"><button class="btn ghost small" id="syGen" type="button" style="flex-shrink:0">Tạo mã</button></span></label>
+      <div class="row"><button class="btn" id="syOn">Bật đồng bộ</button></div>`;
+  }
+  h += `<div id="syncMsg" class="muted" style="font-size:.9rem">${syncMsg}</div>`;
+  box.innerHTML = h;
+  $("#bkDown").onclick = downloadBackup;
+  $("#bkIn").onchange = async e => {
+    const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return;
+    try {
+      const j = JSON.parse(await f.text());
+      const o = j && j.app === "so-on-lop6" && j.S ? j.S : null;
+      if (!o || typeof o !== "object" || !("cards" in o)) throw new Error("File không phải file sao lưu của Sổ ôn lớp 6.");
+      adopt(Object.assign({stars:0, streak:1, lastDay:null, cards:{}, off:{}}, o, {t:Date.now()}), true);
+      save(); drawSync();
+      setSyncMsg(`<span style="color:var(--good)"><b>Đã khôi phục</b> tiến độ từ file ${esc(f.name)}.</span>`);
+    } catch(err){ setSyncMsg(`<span style="color:var(--bad)"><b>Không khôi phục được.</b> ${esc(err.message || err)}</span>`); }
+  };
+  if ($("#syGen")) $("#syGen").onclick = () => { $("#syCode").value = newCode(); };
+  if ($("#syOn")) $("#syOn").onclick = async () => {
+    const u = $("#syUrl").value.trim(), c = $("#syCode").value.trim();
+    if (!URL_OK(u)){ setSyncMsg(`<span style="color:var(--bad)">Địa chỉ phải bắt đầu bằng https://script.google.com/</span>`); return; }
+    if (!CODE_OK(c)){ setSyncMsg(`<span style="color:var(--bad)">Mã cần 6–40 ký tự: chữ không dấu, số, - hoặc _</span>`); return; }
+    SY = {url:u, code:c, base:0}; saveSY(); drawSync(); await syncStart(true); drawSync();
+  };
+  if ($("#syNow")) $("#syNow").onclick = async () => { await syncStart(true); drawSync(); };
+  if ($("#syOff")) $("#syOff").onclick = () => { SY = {}; saveSY(); syncMsg = "Đã tắt đồng bộ trên máy này (tiến độ trên mạng vẫn còn)."; drawSync(); };
+  if ($("#syLink")) $("#syLink").onclick = async () => {
+    const t = $("#syLinkTxt"); t.value = quickLink(); t.hidden = false; t.select();
+    try { await navigator.clipboard.writeText(t.value); setSyncMsg("Đã sao chép link. Mở link này trên máy khác là tự bật đồng bộ."); }
+    catch(e){ setSyncMsg("Hãy sao chép link ở ô trên. Mở link này trên máy khác là tự bật đồng bộ."); }
+  };
+}
+$("#dataBtn").addEventListener("click", () => { if (!$("#dataBox").hidden) drawSync(); });
+syncStart(true);
 
 })();
 </script>
