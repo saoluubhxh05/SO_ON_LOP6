@@ -208,6 +208,7 @@ details.q p{margin:8px 0 0;color:var(--patina)}
 .progress{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden}
 .progress i{display:block;height:100%;background:var(--patina);transition:width .3s}
 .qtext{font-size:1.15rem;font-weight:600;margin:4px 0 0}
+.qimg{display:block;max-width:100%;height:auto;margin:10px auto;background:#fff;border-radius:10px;border:1px solid #d9e2ec}
 .opts{display:flex;flex-direction:column;gap:10px}
 .opt{border:2px solid var(--line);background:var(--surface);border-radius:12px;min-height:52px;padding:10px 14px;text-align:left;display:flex;gap:12px;align-items:center}
 .opt .k{flex:none;width:30px;height:30px;border-radius:8px;background:var(--sunk);display:grid;place-items:center;font-weight:700;font-size:.9rem}
@@ -341,6 +342,8 @@ const BUILTIN = D;
 let META = {src:"builtin"};
 const $ = (s, el=document) => el.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+/* [hinh:ten] -> ảnh hinh/ten.svg (chỉ cho phép chữ, số, _ -) */
+const rich = s => esc(s).replace(/\[hinh:([A-Za-z0-9_-]{1,60})\]/g, (m, n) => `<img class="qimg" src="hinh/${n}.svg" alt="Hình minh họa" loading="lazy">`);
 const LV = {nhan_biet:"Nhận biết", thong_hieu:"Thông hiểu", van_dung:"Vận dụng", van_dung_cao:"Vận dụng cao"};
 const LVORD = ["nhan_biet","thong_hieu","van_dung","van_dung_cao"];
 const KEYS = "ABCD";
@@ -675,7 +678,7 @@ function drawQ(){
   v.innerHTML = `<section class="card" style="display:flex;flex-direction:column;gap:14px">
       <div class="qhead"><span class="eyebrow">${title} · Câu ${Q.i+1}/${Q.list.length}</span><span class="lvl ${q.muc_do}">${LV[q.muc_do]}</span></div>
       <div class="progress" aria-hidden="true"><i style="width:${pct}%"></i></div>
-      <p class="qtext">${esc(q.de).replace("___","<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>")}</p>
+      <div class="qtext">${rich(q.de).replace("___","<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>")}</div>
       ${body}
       <div id="hints"></div>
       <div id="fb"></div>
@@ -686,7 +689,7 @@ function drawQ(){
 function wireQ(q){
   const hb = $("#hintBtn");
   if (hb) hb.onclick = () => {
-    if (q.hintShown < q.goi_y.length){ $("#hints").insertAdjacentHTML("beforeend", `<div class="hint" style="margin-bottom:8px">Gợi ý ${q.hintShown+1}: ${esc(q.goi_y[q.hintShown])}</div>`); q.hintShown++; }
+    if (q.hintShown < q.goi_y.length){ $("#hints").insertAdjacentHTML("beforeend", `<div class="hint" style="margin-bottom:8px">Gợi ý ${q.hintShown+1}: ${rich(q.goi_y[q.hintShown])}</div>`); q.hintShown++; }
     if (q.hintShown >= q.goi_y.length) hb.disabled = true;
   };
   if (q.dang === "trac_nghiem" || q.dang === "dung_sai"){
@@ -750,7 +753,7 @@ function finish(q, ok, shown){
   const next = Q.i + 1 >= Q.list.length ? "Xem kết quả" : "Câu tiếp theo";
   if (Q.kind === "luyen"){
     if (ok) addStar(1);
-    $("#fb").innerHTML = `<div class="fb ${ok?"ok":"ko"}"><b>${ok ? "Chính xác! Con làm tốt lắm." : "Chưa đúng rồi, mình xem lại nhé."}</b>${!ok?`<div>Đáp án: <strong>${esc(correctText(q))}</strong></div>`:""}<div>${esc(q.giai_thich)}</div></div>`;
+    $("#fb").innerHTML = `<div class="fb ${ok?"ok":"ko"}"><b>${ok ? "Chính xác! Con làm tốt lắm." : "Chưa đúng rồi, mình xem lại nhé."}</b>${!ok?`<div>Đáp án: <strong>${esc(correctText(q))}</strong></div>`:""}<div>${rich(q.giai_thich)}</div></div>`;
   }
   const hb = $("#hintBtn"); if (hb) hb.remove();
   $("#ctrl").insertAdjacentHTML("beforeend", `<button class="btn" id="nextBtn">${next}</button>`);
@@ -773,8 +776,8 @@ function drawResult(){
         ${wrong.length ? `<button class="btn" id="redo">Làm lại ${wrong.length} câu sai</button>` : ""}
         <button class="btn ghost" id="again">${Q.kind==="kiemtra"?"Làm đề khác":"Luyện lại từ đầu"}</button>
       </div>
-      <div class="review">${Q.answers.map((a,i)=>`<div class="rv ${a.ok?"":"ko"}"><strong>Câu ${i+1}.</strong> ${esc(a.q.de)}
-        <p>${a.ok?"✓ Đúng":"✗ Con chọn: "+esc(a.shown)+" · Đáp án: "+esc(correctText(a.q))}</p><p>${esc(a.q.giai_thich)}</p></div>`).join("")}</div>
+      <div class="review">${Q.answers.map((a,i)=>`<div class="rv ${a.ok?"":"ko"}"><strong>Câu ${i+1}.</strong> ${rich(a.q.de)}
+        <p>${a.ok?"✓ Đúng":"✗ Con chọn: "+esc(a.shown)+" · Đáp án: "+esc(correctText(a.q))}</p><p>${rich(a.q.giai_thich)}</p></div>`).join("")}</div>
     </section>`;
   const ids = wrong.map(a=>a.q.id);
   if ($("#redo")) $("#redo").onclick = () => startQuiz(v, "luyen", ids);
@@ -1045,7 +1048,7 @@ function rowHTML(o){
   if (PK.tab === "cau"){
     return `<div class="pr ${on?"":"off"}"><input type="checkbox" class="ck" id="ck-${esc(o.id)}" data-id="${esc(o.id)}" ${on?"checked":""} aria-label="Dùng câu này">
       <div class="pb"><div class="pm">${meta}<span>${DGL[it.dang]}</span><span class="lvl ${it.muc_do}">${LV[it.muc_do]}</span></div>
-      <details><summary class="pt">${esc(it.de)}</summary>${answerHTML(it)}${it.giai_thich?`<p class="pg">${esc(it.giai_thich)}</p>`:""}${(it.goi_y||[]).length?`<p class="pg">Gợi ý: ${it.goi_y.map(esc).join(" · ")}</p>`:""}</details></div></div>`;
+      <details><summary class="pt">${rich(it.de)}</summary>${answerHTML(it)}${it.giai_thich?`<p class="pg">${rich(it.giai_thich)}</p>`:""}${(it.goi_y||[]).length?`<p class="pg">Gợi ý: ${it.goi_y.map(esc).join(" · ")}</p>`:""}</details></div></div>`;
   }
   return `<div class="pr ${on?"":"off"}"><input type="checkbox" class="ck" id="ck-${esc(o.id)}" data-id="${esc(o.id)}" ${on?"checked":""} aria-label="Dùng thẻ này">
     <div class="pb"><div class="pm">${meta}${it.loai?`<span>${esc(it.loai)}</span>`:""}</div>
