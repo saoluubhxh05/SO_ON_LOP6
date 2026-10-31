@@ -121,8 +121,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .lesson[aria-pressed="true"] small{color:var(--patina)}
 
 /* Chế độ */
-.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--sunk);padding:4px;border-radius:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
-.mode{border:0;background:transparent;border-radius:9px;min-height:44px;font-weight:600;font-size:.95rem;color:var(--muted);padding:6px 4px}
+.modes{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.mode{flex:1 1 0;min-width:0;border:0;background:transparent;border-radius:9px;min-height:44px;font-weight:600;font-size:.95rem;color:var(--muted);padding:6px 4px}
 .mode[aria-selected="true"]{background:var(--surface);color:var(--patina);box-shadow:0 1px 3px #0002}
 
 .panel{display:flex;flex-direction:column;gap:16px}
@@ -246,6 +246,47 @@ details.q p{margin:8px 0 0;color:var(--patina)}
 .break{background:var(--bronze);color:var(--surface);border-radius:var(--r);padding:12px 16px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .break .btn{background:var(--surface);color:var(--bronze);min-height:40px}
 .foot{font-size:.8rem;color:var(--muted);text-align:center}
+/* Luyện nói */
+.nhead{display:flex;flex-direction:column;gap:12px}
+.nbody{display:flex;flex-direction:column;gap:12px}
+.nset{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tg{border:2px solid var(--line);background:var(--surface);border-radius:999px;min-height:40px;padding:4px 12px;font-size:.85rem;font-weight:600;color:var(--muted)}
+.tg[aria-pressed="true"]{border-color:var(--patina);background:var(--patina-soft);color:var(--patina)}
+.nset select{font:inherit;font-size:.85rem;min-height:40px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:2px 10px;max-width:100%}
+.pchips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.pc{flex:none;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:6px 12px;min-height:48px;text-align:left;display:flex;flex-direction:column;font-size:.78rem;color:var(--muted);max-width:180px}
+.pc b{font-size:.92rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc[aria-pressed="true"]{border-color:var(--patina);background:var(--patina-soft)}
+.pc.done span::after{content:" ✓";color:var(--good);font-weight:700}
+.pat{font-family:var(--f-display);font-size:1.05rem;color:var(--muted);line-height:1.6}
+.slot{display:inline-block;padding:0 6px;border-radius:6px;background:var(--bronze-soft);color:var(--bronze);font-weight:700}
+.slot.blank{min-width:64px;text-align:center}
+.target{font-family:var(--f-display);font-size:1.45rem;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
+.w{border-radius:6px;padding:0 2px}
+.w.ok{color:var(--good);background:var(--good-soft)}
+.w.miss{color:var(--bad);background:var(--bad-soft);text-decoration:underline wavy}
+.vi{color:var(--muted);font-size:.98rem}
+.ask{display:flex;gap:10px;align-items:center;background:var(--patina-soft);border-radius:12px;padding:12px 14px;font-weight:700;font-size:1.15rem;color:var(--patina)}
+.cues{display:flex;flex-wrap:wrap;gap:8px}
+.cw{display:flex;flex-direction:column;border:2px dashed var(--bronze);border-radius:12px;padding:6px 12px;background:var(--bronze-soft)}
+.cw b{color:var(--bronze);font-size:1.1rem}
+.cw small{color:var(--muted);font-size:.8rem}
+.cw.sm{padding:2px 10px}
+.cw.sm b{font-size:.95rem}
+.mic{min-width:150px}
+.mic.on{background:var(--bad);animation:nPulse 1.2s infinite}
+@keyframes nPulse{50%{opacity:.7}}
+.live{min-height:1.6em;color:var(--muted);font-style:italic;overflow-wrap:anywhere}
+.sc{display:flex;gap:14px;align-items:center}
+.sc .score{font-size:2.4rem}
+.kbin{display:flex;gap:8px;flex:1 1 260px;min-width:0}
+.kbin input,.kbin textarea{flex:1;font:inherit;font-size:1.05rem;min-height:52px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 12px;min-width:0}
+.para{display:flex;flex-direction:column;gap:10px;margin:0;padding:0 0 0 1.4em}
+.para li{border-left:4px solid var(--line);padding:4px 0 4px 12px;font-size:1.05rem}
+.para li.ok{border-left-color:var(--good)}
+.para li.ko{border-left-color:var(--bad)}
+.lk{color:var(--patina);font-weight:700}
+@media (prefers-reduced-motion:reduce){.mic.on{animation:none}}
 @media (max-width:560px){
   body{font-size:17px}
   .tiles{grid-template-columns:repeat(2,1fr)}
@@ -288,7 +329,7 @@ details.q p{margin:8px 0 0;color:var(--patina)}
     <div class="drop">
       <label for="xlsxIn" class="btn">Chọn file Excel</label>
       <input id="xlsxIn" type="file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="vh">
-      <span class="muted" style="font-size:.9rem">File theo mẫu SO_ON_LOP6_du_lieu_mau.xlsx (các trang DANH_MUC, TOM_TAT, NOI_DUNG, CAN_NHO, TU_KIEM_TRA, THE_NHO, CAU_HOI).</span>
+      <span class="muted" style="font-size:.9rem">File theo mẫu SO_ON_LOP6_du_lieu_mau.xlsx (các trang DANH_MUC, TOM_TAT, NOI_DUNG, CAN_NHO, TU_KIEM_TRA, THE_NHO, CAU_HOI; Tiếng Anh thêm MAU_CAU).</span>
     </div>
     <div id="importOut"></div>
     <div class="row" id="dataActs"></div>
@@ -314,6 +355,7 @@ details.q p{margin:8px 0 0;color:var(--patina)}
     <button class="mode" role="tab" data-mode="the">Thẻ nhớ</button>
     <button class="mode" role="tab" data-mode="luyen">Luyện tập</button>
     <button class="mode" role="tab" data-mode="kiemtra">Kiểm tra</button>
+    <button class="mode" role="tab" data-mode="noi" hidden>Luyện nói</button>
   </div>
 
   <main id="view" class="panel" aria-live="polite"></main>
@@ -386,6 +428,7 @@ const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Ma
 const norm = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,"d").replace(/[^a-z0-9-]/g,"");
 /* ---------- danh mục Phần → Chương → Bài ---------- */
 let CHAPS = {}, B2C = {};
+let WANT = {ma:S.ma, chap:S.chap, mode:S.mode};   // bài đang học lúc mở app: giữ lại để khôi phục khi dữ liệu đã lưu nạp xong
 const ready = c => c.bai.filter(b => D.lessons[b[0]]);
 const isChap = ma => !!CHAPS[ma];
 const chapOf = ma => isChap(ma) ? CHAPS[ma] : CHAPS[B2C[ma]];
@@ -437,15 +480,20 @@ function syncNav(){
   });
   document.querySelectorAll(".chap").forEach(b => b.onclick = () => pickChap(b.dataset.chap));
   document.querySelectorAll(".lesson[data-ma]").forEach(b => b.onclick = () => setLesson(b.dataset.ma));
+  const mp = S.ma && chapOf(S.ma), nb = document.querySelector('.mode[data-mode="noi"]'), showNoi = isAnh(part) && (!mp || mp.part === part.key);
+  if (nb) nb.hidden = !showNoi;
+  if (!showNoi && S.mode === "noi") S.mode = "hieu";
   document.querySelectorAll(".mode").forEach(b => b.setAttribute("aria-selected", b.dataset.mode===S.mode));
 }
 document.querySelectorAll(".mode").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
 function render(){
   const v = $("#view");
+  try { noiStop(); } catch(e){}
   if (!S.ma){ v.innerHTML = `<section class="card result"><div class="eyebrow">Chưa có bài học</div><h2 style="font-size:1.3rem">Bấm nút “Dữ liệu” ở trên để nhập file Excel bài học.</h2></section>`; return; }
   if (S.mode === "hieu" && isChap(S.ma)) renderOverview(v);
   else if (S.mode === "hieu") renderHieu(v);
   else if (S.mode === "the") startCards(v);
+  else if (S.mode === "noi") renderNoi(v);
   else if (S.mode === "luyen") startQuiz(v, "luyen");
   else startQuiz(v, "kiemtra");
 }
@@ -492,11 +540,12 @@ function renderHieu(v){
     <section class="card">
       ${(T.tu_kiem_tra||[]).length ? `<div class="eyebrow">Tự kiểm tra (bấm để xem đáp án)</div>
       <div class="self">${T.tu_kiem_tra.map(q=>`<details class="q"><summary>${esc(q.hoi)}</summary><p>${esc(q.dap)}</p></details>`).join("")}</div>` : `<div class="eyebrow">Học tiếp</div>`}
-      <div class="row" style="margin-top:14px"><button class="btn" id="goCards">Học thuộc bằng thẻ nhớ</button><button class="btn ghost" id="goQuiz">Làm bài luyện tập</button></div>
+      <div class="row" style="margin-top:14px"><button class="btn" id="goCards">Học thuộc bằng thẻ nhớ</button><button class="btn ghost" id="goQuiz">Làm bài luyện tập</button>${hasNoi(S.ma) ? `<button class="btn soft" id="goNoi">Luyện nói</button>` : ""}</div>
       ${T.nguon?`<p class="src" style="margin:12px 0 0">Nguồn: ${esc(T.nguon)}</p>`:""}
     </section>`;
   $("#goCards").onclick = () => setMode("the");
   $("#goQuiz").onclick = () => setMode("luyen");
+  if ($("#goNoi")) $("#goNoi").onclick = () => setMode("noi");
   if (T.cong_cu === "doi_gio") wireClock();
   if (T.cong_cu === "the_ki") wireCentury();
 }
@@ -784,6 +833,372 @@ function drawResult(){
   $("#again").onclick = () => startQuiz(v, Q.kind);
 }
 
+/* ================= LUYỆN NÓI (Tiếng Anh · mẫu câu kiểu EngSpur, trang MAU_CAU) ================= */
+/* 3 chế độ: Nghe – nhắc · Thay thế (máy hỏi → con nói cả câu) · Tự nói đoạn (5 mẫu nối bằng từ nối, cấp 1–2).
+   Chấm theo thứ tự từ (LCS), tô đỏ từ thiếu, it's = it is. Giọng mặc định Anh–Anh, dự phòng Anh–Mỹ. Tiến độ ở S.noi (đồng bộ chung). */
+const SRC = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+const HAS_TTS = typeof window.speechSynthesis !== "undefined" && typeof window.SpeechSynthesisUtterance !== "undefined";
+if (!S.noi || typeof S.noi !== "object") S.noi = {};
+function NC(){   // luôn trả về CÙNG một đối tượng (sửa trực tiếp), thêm giá trị mặc định còn thiếu
+  if (!S.noi || typeof S.noi !== "object") S.noi = {};
+  const c = (S.noi.cfg && typeof S.noi.cfg === "object") ? S.noi.cfg : (S.noi.cfg = {});
+  const d = {m:"nhac", kb:!SRC, auto:true, ipa:true, khung:true, cap:1, giong:"en-GB", toc:0.9};
+  for (const k in d) if (!(k in c)) c[k] = d[k];
+  return c;
+}
+let N = {ma:"", p:0, k:0, pick:null, tok:0, res:null, show:false, timer:0};
+let REC = null, VOICES = [];
+function loadVoices(){ try { VOICES = window.speechSynthesis.getVoices() || []; } catch(e){ VOICES = []; } }
+if (HAS_TTS){ loadVoices(); try { window.speechSynthesis.addEventListener("voiceschanged", loadVoices); } catch(e){} }
+function isAnh(p){ return !!p && (p.key === "ANH" || norm(p.ten) === "tienganh"); }
+function hasNoi(ma){ const L = D.lessons[ma]; return !!(L && L.mau_cau && L.mau_cau.length); }
+function noiStop(){
+  N.tok++; clearTimeout(N.timer);
+  if (REC){ const r = REC; REC = null; try { r.abort(); } catch(e){} }
+  if (HAS_TTS){ try { window.speechSynthesis.cancel(); } catch(e){} }
+}
+
+/* ---------- đọc (TTS) ---------- */
+function voiceFor(lang){
+  const L = VOICES.filter(v => String(v.lang || "").replace("_", "-").toLowerCase().indexOf(lang.toLowerCase()) === 0);
+  return L.find(v => /natural|neural|online|google/i.test(v.name)) || L.find(v => v.localService) || L[0] || null;
+}
+function speak(text, done, tok){
+  if (tok === undefined) tok = N.tok;
+  let ended = false;
+  const fin = () => { if (ended) return; ended = true; if (done && tok === N.tok) done(); };
+  if (!HAS_TTS || !text){ setTimeout(fin, 0); return; }
+  try {
+    const c = NC(), u = new SpeechSynthesisUtterance(text);
+    if (!VOICES.length) loadVoices();
+    const v = voiceFor(c.giong) || voiceFor(c.giong === "en-GB" ? "en-US" : "en-GB") || voiceFor("en");
+    if (v){ u.voice = v; u.lang = v.lang; } else u.lang = c.giong;
+    u.rate = c.toc; u.onend = fin; u.onerror = fin;
+    window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+    setTimeout(fin, Math.max(2500, text.length * 90 / c.toc + 1500));   // dự phòng khi trình duyệt không báo onend
+  } catch(e){ fin(); }
+}
+
+/* ---------- nghe (nhận giọng nói) ---------- */
+const MICERR = {
+  "not-allowed": "Trình duyệt chưa cho dùng micrô. Bấm biểu tượng ổ khoá/ⓘ cạnh thanh địa chỉ → Micrô → Cho phép, rồi thử lại. Hoặc bật ⌨ Gõ phím.",
+  "service-not-allowed": "Trình duyệt chưa cho dùng micrô. Bấm biểu tượng ổ khoá/ⓘ cạnh thanh địa chỉ → Micrô → Cho phép, rồi thử lại. Hoặc bật ⌨ Gõ phím.",
+  "network": "Nhận giọng nói cần Internet (Chrome gửi tiếng nói lên máy chủ để nhận dạng). Kiểm tra mạng, hoặc bật ⌨ Gõ phím.",
+  "audio-capture": "Không tìm thấy micrô. Cắm tai nghe có mic, hoặc bật ⌨ Gõ phím.",
+  "language-not-supported": "Máy chưa nhận được giọng Anh–Anh, đã chuyển sang Anh–Mỹ. Con bấm 🎤 lại nhé.",
+  "no-speech": "Cô chưa nghe thấy gì. Con bấm 🎤 rồi nói to, rõ hơn nhé."
+};
+function paintMic(on){
+  const b = $("#micBtn"); if (!b) return;
+  const doan = NC().m === "doan";
+  b.classList.toggle("on", on);
+  b.textContent = on ? (doan ? "■ Xong" : "■ Dừng") : (doan ? "🎤 Nói cả đoạn" : "🎤 Nói");
+}
+function listen(long, onLive, onDone){
+  if (!SRC) return false;
+  if (REC){ const o = REC; REC = null; try { o.abort(); } catch(e){} }
+  const tok = N.tok, c = NC(), t0 = Date.now();
+  const acc = [], alts = []; let err = "", stopAsked = false, restarts = 0;
+  const r = new SRC();
+  r.lang = c.giong; r.interimResults = true; r.continuous = long; r.maxAlternatives = long ? 1 : 3;
+  r.onresult = e => {
+    let inter = "";
+    for (let i = e.resultIndex; i < e.results.length; i++){
+      const res = e.results[i];
+      if (res.isFinal){ acc.push(String(res[0].transcript).trim()); if (!long) for (let a = 0; a < res.length; a++) alts.push(String(res[a].transcript).trim()); }
+      else inter += res[0].transcript;
+    }
+    if (tok === N.tok && onLive) onLive((acc.join(" ") + " " + inter).trim());
+  };
+  r.onerror = e => { err = e.error || "loi"; };
+  r.onend = () => {
+    if (REC !== r) return;                                   // đã bị huỷ (đổi câu, đổi chế độ)
+    if (long && !stopAsked && (!err || err === "no-speech") && restarts < 20 && Date.now() - t0 < 180000){
+      err = ""; restarts++; try { r.start(); return; } catch(e2){}  // nói đoạn: Chrome hay tự ngắt khi ngừng một chút → nghe tiếp
+    }
+    REC = null; paintMic(false);
+    if (tok !== N.tok) return;
+    if (err === "language-not-supported" && c.giong === "en-GB"){ c.giong = "en-US"; save(); }
+    const said = acc.join(" ").trim();
+    onDone(said, alts, said ? "" : (err || "no-speech"));
+  };
+  r._stop = () => { stopAsked = true; try { r.stop(); } catch(e){} };
+  try { r.start(); } catch(e){ return false; }
+  REC = r; paintMic(true); return true;
+}
+
+/* ---------- chấm điểm: so khớp theo thứ tự (LCS) ---------- */
+const CONTR = {"it's":"it is","that's":"that is","there's":"there is","what's":"what is","where's":"where is","who's":"who is","how's":"how is","here's":"here is",
+  "he's":"he is","she's":"she is","let's":"let us","i'm":"i am","you're":"you are","we're":"we are","they're":"they are",
+  "isn't":"is not","aren't":"are not","wasn't":"was not","weren't":"were not","don't":"do not","doesn't":"does not","didn't":"did not",
+  "can't":"can not","cannot":"can not","won't":"will not","couldn't":"could not","shouldn't":"should not","haven't":"have not","hasn't":"has not","mustn't":"must not",
+  "i'll":"i will","you'll":"you will","we'll":"we will","they'll":"they will","he'll":"he will","she'll":"she will","it'll":"it will",
+  "i've":"i have","you've":"you have","we've":"we have","they've":"they have","i'd":"i would","you'd":"you would"};
+const SPELL = {favorite:"favourite",favorites:"favourites",color:"colour",colors:"colours",colorful:"colourful",neighbor:"neighbour",neighbors:"neighbours",
+  neighborhood:"neighbourhood",program:"programme",programs:"programmes",center:"centre",theater:"theatre",traveling:"travelling",traveled:"travelled",
+  gray:"grey",mom:"mum",moms:"mums",okay:"ok",tv:"tv",cozy:"cosy",practice:"practise"};
+const NUMW = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty".split(" ");
+function toks(s){
+  const out = [];
+  String(s || "").toLowerCase().replace(/[’‘`´]/g, "'").split(/[^a-z0-9']+/).forEach(w => {
+    w = w.replace(/^'+|'+$/g, ""); if (!w) return;
+    if (CONTR[w]){ out.push(...CONTR[w].split(" ")); return; }
+    if (/^\d+$/.test(w) && +w <= 20){ out.push(NUMW[+w]); return; }
+    w = w.replace(/'/g, ""); out.push(SPELL[w] || w);
+  });
+  return out;
+}
+function lcsHit(a, b){
+  const n = a.length, m = b.length, T = [];
+  for (let i = 0; i <= n; i++) T.push(new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) T[i][j] = a[i] === b[j] ? T[i+1][j+1] + 1 : Math.max(T[i+1][j], T[i][j+1]);
+  const hit = new Set(); let i = 0, j = 0;
+  while (i < n && j < m){ if (a[i] === b[j]){ hit.add(i); i++; j++; } else if (T[i+1][j] >= T[i][j+1]) i++; else j++; }
+  return hit;
+}
+function grade(target, cands){
+  const words = String(target).split(/\s+/).filter(Boolean), owner = [], tt = [];
+  words.forEach((w, i) => toks(w).forEach(t => { tt.push(t); owner.push(i); }));
+  let best = null;
+  (cands.length ? cands : [""]).forEach(s => { const hit = lcsHit(tt, toks(s)); if (!best || hit.size > best.hit.size) best = {hit, said:s}; });
+  const okW = words.map((w, i) => { let any = false, all = true; owner.forEach((o, j) => { if (o === i){ any = true; if (!best.hit.has(j)) all = false; } }); return !any || all; });
+  return {pct: tt.length ? Math.round(best.hit.size / tt.length * 100) : 0, said: best.said, words, okW};
+}
+function wordsHTML(g){ return g.words.map((w, i) => `<span class="w ${g.okW[i] ? "ok" : "miss"}">${esc(w)}</span>`).join(" "); }
+
+/* ---------- tiến độ ---------- */
+function noiKey(P, m, k){ return `${P.id}:${m}:${k}`; }
+function noiBest(key){ return (S.noi.sc || {})[key] || 0; }
+function noiRec(key, pct){
+  const sc = S.noi.sc = S.noi.sc || {}, old = sc[key] || 0;
+  if (pct <= old) return;
+  sc[key] = pct;
+  if (old < 80 && pct >= 80) addStar(key.indexOf(":doan:") > 0 ? 3 : 1); else save();
+}
+function mergeNoi(a, b, newer){
+  a = a || {}; b = b || {};
+  const sc = Object.assign({}, a.sc || {}), bs = b.sc || {};
+  for (const k in bs) if ((bs[k] || 0) > (sc[k] || 0)) sc[k] = bs[k];
+  return {cfg: Object.assign({}, (newer === b ? b.cfg : a.cfg) || a.cfg || b.cfg || {}), sc};
+}
+
+/* ---------- vẽ ---------- */
+function patHTML(P, blank){ return esc(P.mau).replace(/\[([^\]]+)\]/g, (m, x) => blank ? `<span class="slot blank">…</span>` : `<span class="slot">${x}</span>`); }
+function resHTML(g){
+  const p = g.pct, msg = p >= 90 ? "Tuyệt vời! Con nói rất chuẩn." : p >= 80 ? "Giỏi lắm! Gần như hoàn hảo." : p >= 50 ? "Gần đúng rồi. Nói lại các từ màu đỏ nhé." : "Nghe lại câu mẫu rồi thử lần nữa nhé.";
+  return `<div class="fb ${p >= 80 ? "ok" : "ko"}"><div class="sc"><span class="score">${p}%</span><div><b>${msg}</b><div class="muted" style="font-size:.9rem">${NC().kb ? "Con gõ" : "Máy nghe được"}: “${esc(g.said || "…")}”</div></div></div></div>`;
+}
+function renderNoi(v){
+  if (isChap(S.ma)){
+    const ls = ready(CHAPS[S.ma]).map(b => b[0]).filter(hasNoi);
+    v.innerHTML = `<section class="card overview"><div class="eyebrow">Luyện nói</div>
+      <p class="muted" style="margin:0">Luyện nói làm theo từng unit. Chọn một unit:</p>
+      ${ls.length ? ls.map(ma => { const T = D.lessons[ma].tomtat; return `<button class="ov" data-go="${esc(ma)}"><b>${esc(T.bai)}. ${esc(T.tieu_de)}</b><span class="muted" style="font-size:.9rem">${D.lessons[ma].mau_cau.length} mẫu câu</span></button>`; }).join("")
+        : `<p style="margin:0">Chương này chưa có unit nào có mẫu câu.</p>`}</section>`;
+    v.querySelectorAll("[data-go]").forEach(b => b.onclick = () => setLesson(b.dataset.go));
+    return;
+  }
+  if (!hasNoi(S.ma)){
+    v.innerHTML = `<section class="card result"><div class="eyebrow">Luyện nói</div>
+      <h2 style="font-size:1.2rem">Unit này chưa có mẫu câu để luyện nói.</h2>
+      <p class="muted" style="margin:0">Phụ huynh: soạn lại unit này bằng công cụ Soạn bài (bản mới tự ghi trang MAU_CAU), rồi mở app bằng nút “Mở app” của công cụ. Nếu đã soạn rồi mà vẫn thấy dòng này: bấm <b>Dữ liệu → Chọn file Excel</b> và chọn lại file dữ liệu.</p></section>`;
+    return;
+  }
+  if (N.ma !== S.ma){ N.ma = S.ma; N.p = 0; N.k = 0; N.pick = null; N.res = null; N.show = false; }
+  drawNoi(false);
+}
+function chipsHTML(MC, m){
+  return `<div class="pchips" aria-label="Mẫu câu">${MC.map((P, i) => {
+    const n = P.drills.filter((_, k) => noiBest(noiKey(P, m, k)) >= 80).length;
+    return `<button class="pc ${n === P.drills.length ? "done" : ""}" data-p="${i}" aria-pressed="${i === N.p}"><span>Mẫu ${i+1} · ${n}/${P.drills.length}</span><b>${esc(P.goi_mo || P.the_loai || "")}</b></button>`;
+  }).join("")}</div>`;
+}
+function drillHTML(MC, P, c){
+  const k = N.k, tgt = P.drills[k], n = P.drills.length, g = N.res;
+  const vi = (P.vi || [])[k] || "", ipa = (P.ipa || [])[k] || "", tv = (P.tu_vi || [])[k] || [];
+  const cue = (P.tu[k] || []).map((w, j) => `<span class="cw"><b>${esc(w)}</b>${tv[j] ? `<small>${esc(tv[j])}</small>` : ""}</span>`).join("");
+  let top;
+  if (c.m === "nhac"){
+    top = `<div class="pat">Mẫu: ${patHTML(P, false)}</div>
+      <div class="target">${g ? wordsHTML(g) : esc(tgt)}</div>
+      ${c.ipa && ipa ? `<div class="ipa">${esc(ipa)}</div>` : ""}${vi ? `<div class="vi">${esc(vi)}</div>` : ""}`;
+  } else {
+    const show = g || N.show;
+    top = `${P.hoi ? `<div class="ask"><span aria-hidden="true">🔊</span><span>${esc(P.hoi)}</span></div>` : ""}
+      <div class="muted" style="font-size:.9rem">Trả lời cả câu bằng các từ gợi ý:</div>
+      <div class="cues">${cue}</div>
+      ${c.khung ? `<div class="pat">${patHTML(P, true)}</div>` : ""}
+      ${show ? `<div class="target">${g ? wordsHTML(g) : esc(tgt)}</div>${vi ? `<div class="vi">${esc(vi)}</div>` : ""}` : ""}`;
+  }
+  const input = c.kb
+    ? `<div class="kbin"><input id="nKb" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="Gõ câu tiếng Anh" aria-label="Gõ câu tiếng Anh"><button class="btn" id="nKbGo">Chấm</button></div>`
+    : `<button class="btn mic" id="micBtn">🎤 Nói</button>`;
+  return `<section class="card nbody">
+    <div class="qhead"><span class="eyebrow">Mẫu ${N.p+1}/${MC.length} · câu ${k+1}/${n}</span>${P.the_loai ? `<span class="lvl thong_hieu">${esc(P.the_loai)}</span>` : ""}</div>
+    <div class="progress" aria-hidden="true"><i style="width:${Math.round(k / n * 100)}%"></i></div>
+    ${top}
+    <div class="row"><button class="btn soft" id="nPlay">🔊 ${c.m === "nhac" ? "Nghe câu" : "Nghe câu hỏi"}</button>${input}${c.m === "thay" && !N.show && !g ? `<button class="btn ghost" id="nShow">Xem đáp án</button>` : ""}</div>
+    <div class="live" id="nLive" aria-live="polite">${c.auto && !c.kb && SRC && !g ? "Bấm 🔊: máy đọc xong sẽ tự bật mic." : ""}</div>
+    <div id="nRes">${g ? resHTML(g) : ""}</div>
+    <div class="row" style="justify-content:space-between"><button class="btn ghost" id="nPrev">← Câu trước</button><button class="btn" id="nNext">Câu tiếp →</button></div>
+  </section>`;
+}
+const LOW1 = new Set("there this that these those my our your his her their its it we you he she they the a an after before in on at every don't do does if when people some many let's it's there's always usually often sometimes never please can could should must will what where how why who which one two".split(" "));
+function lowFirst(s){ const w = s.split(/\s+/)[0].toLowerCase().replace(/[^a-z']/g, ""); return LOW1.has(w) ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+function linkS(lk, s){
+  lk = String(lk || "").trim(); s = String(s || "").trim();
+  if (!lk) return s;
+  s = lowFirst(s);
+  if (!/[,:;]$/.test(lk)) lk += ",";
+  return lk + " " + s;
+}
+function doanLines(MC){
+  if (!N.pick || N.pick.length !== MC.length) N.pick = MC.map(P => Math.floor(Math.random() * P.drills.length));
+  return MC.map((P, i) => { const k = Math.min(N.pick[i], P.drills.length - 1); return {P, k, s: linkS(P.noi, P.drills[k]), vi: (P.vi || [])[k] || ""}; });
+}
+function gradePara(lines, said){
+  const g = grade(lines.map(x => x.s).join(" "), [said]); let w0 = 0;
+  g.parts = lines.map(x => {
+    const n = x.s.split(/\s+/).filter(Boolean).length, words = g.words.slice(w0, w0 + n), okW = g.okW.slice(w0, w0 + n); w0 += n;
+    return {words, okW, pct: Math.round(okW.filter(Boolean).length / Math.max(1, n) * 100)};
+  });
+  return g;
+}
+function doanHTML(MC, c){
+  const lines = doanLines(MC), g = N.res, best = noiBest(`${S.ma}:doan:${c.cap}`);
+  const li = lines.map((x, i) => {
+    const P = x.P; let inner;
+    if (g) inner = wordsHTML(g.parts[i]) + ` <span class="muted" style="font-size:.85rem">(${g.parts[i].pct}%)</span>`;
+    else if (N.show) inner = esc(x.s) + (x.vi ? `<div class="vi">${esc(x.vi)}</div>` : "");
+    else if (c.cap === 1) inner = `<span class="lk">${esc(P.noi || "")}</span> ${patHTML(P.noi ? {mau: lowFirst(String(P.mau))} : P, true)}<div class="cues" style="margin-top:4px">${(P.tu[x.k] || []).map(w => `<span class="cw sm"><b>${esc(w)}</b></span>`).join("")}</div>`;
+    else inner = `<span class="lk">${esc(P.noi || "")}</span> <b>${esc(P.goi_mo || "…")}</b><div class="vi">${esc(x.vi)}</div>`;
+    return `<li class="${g ? (g.parts[i].pct >= 80 ? "ok" : "ko") : ""}">${inner}</li>`;
+  }).join("");
+  const input = c.kb
+    ? `<div class="kbin" style="width:100%"><textarea id="nKb" rows="4" autocapitalize="off" spellcheck="false" placeholder="Gõ cả đoạn 5 câu tiếng Anh" aria-label="Gõ cả đoạn"></textarea></div><button class="btn" id="nKbGo">Chấm</button>`
+    : `<button class="btn mic" id="micBtn">🎤 Nói cả đoạn</button>`;
+  return `<section class="card nbody">
+    <div class="qhead"><span class="eyebrow">Tự nói đoạn · Cấp ${c.cap}</span><span class="muted" style="font-size:.85rem">Điểm cao nhất: ${best}%</span></div>
+    <p class="muted" style="margin:0;font-size:.95rem">${c.cap === 1 ? "Nói liền 5 câu thành một đoạn: mở đầu mỗi câu bằng từ nối màu xanh, điền các từ gợi ý vào chỗ trống." : "Chỉ còn từ khoá và nghĩa tiếng Việt. Con tự nói cả đoạn bằng tiếng Anh, nhớ dùng từ nối."}</p>
+    <ol class="para">${li}</ol>
+    <div class="row">${input}<button class="btn soft" id="dPlay">🔊 Nghe đoạn mẫu</button><button class="btn ghost" id="dShow">${N.show ? "Ẩn đoạn mẫu" : "Xem đoạn mẫu"}</button><button class="btn ghost" id="dNew">🔀 Đổi câu khác</button></div>
+    <div class="live" id="nLive" aria-live="polite"></div>
+    <div id="nRes">${g ? resHTML(g) : ""}</div>
+  </section>`;
+}
+function drawNoi(play){
+  const v = $("#view"), Lx = D.lessons[S.ma], MC = Lx.mau_cau, c = NC(), T = Lx.tomtat;
+  if (N.p >= MC.length) N.p = 0;
+  const P = MC[N.p]; if (N.k >= P.drills.length) N.k = 0;
+  const tg = (key, label, on, title) => `<button class="tg" data-tg="${key}" aria-pressed="${!!on}"${title ? ` title="${esc(title)}"` : ""}>${label}</button>`;
+  let opts = tg("kb", "⌨ Gõ phím", c.kb, "Gõ câu thay cho nói vào mic");
+  if (SRC && c.m !== "doan") opts += tg("auto", "Tự bật mic", c.auto, "Máy đọc xong tự bật mic; nói đúng thì tự sang câu sau");
+  if (c.m === "nhac") opts += tg("ipa", "IPA", c.ipa, "Hiện phiên âm");
+  if (c.m === "thay") opts += tg("khung", "Khung câu", c.khung, "Hiện khung mẫu câu có chỗ trống");
+  if (c.m === "doan") opts += tg("cap1", "Cấp 1", c.cap === 1, "Có khung câu + từ gợi ý") + tg("cap2", "Cấp 2", c.cap === 2, "Chỉ từ khoá + nghĩa tiếng Việt");
+  opts += `<select id="nGiong" aria-label="Giọng đọc">${[["en-GB","Giọng Anh–Anh"],["en-US","Giọng Anh–Mỹ"]].map(o => `<option value="${o[0]}" ${c.giong === o[0] ? "selected" : ""}>${o[1]}</option>`).join("")}</select>`;
+  opts += `<select id="nToc" aria-label="Tốc độ đọc">${[[0.75,"Đọc chậm"],[0.9,"Đọc vừa"],[1,"Đọc nhanh"]].map(o => `<option value="${o[0]}" ${c.toc === o[0] ? "selected" : ""}>${o[1]}</option>`).join("")}</select>`;
+  v.innerHTML = `<section class="card nhead">
+      <div class="qhead"><span class="eyebrow">Luyện nói · ${esc(T.bai)}. ${esc(T.tieu_de)}</span><span class="muted" style="font-size:.85rem">${MC.length} mẫu câu</span></div>
+      <div class="ptabs" role="tablist" aria-label="Kiểu luyện nói">${[["nhac","Nghe – nhắc"],["thay","Thay thế"],["doan","Tự nói đoạn"]].map(m => `<button class="ptab" role="tab" data-nm="${m[0]}" aria-selected="${c.m === m[0]}">${m[1]}</button>`).join("")}</div>
+      <div class="nset">${opts}</div>
+      ${!SRC ? `<p class="src" style="margin:0">Trình duyệt này không nhận được giọng nói nên dùng ⌨ gõ phím. Trên máy tính nên mở bằng Chrome hoặc Edge.</p>` : ""}
+    </section>
+    ${c.m === "doan" ? doanHTML(MC, c) : chipsHTML(MC, c.m) + drillHTML(MC, P, c)}`;
+  wireNoi(play);
+}
+function wireNoi(play){
+  const c = NC(), v = $("#view");
+  v.querySelectorAll("[data-nm]").forEach(b => b.onclick = () => { noiStop(); c.m = b.dataset.nm; N.res = null; N.show = false; save(); drawNoi(false); });
+  v.querySelectorAll("[data-tg]").forEach(b => b.onclick = () => {
+    const t = b.dataset.tg; noiStop();
+    if (t === "cap1" || t === "cap2"){ c.cap = t === "cap1" ? 1 : 2; N.res = null; }
+    else if (t === "kb" && !SRC) c.kb = true;
+    else c[t] = !c[t];
+    save(); drawNoi(false);
+  });
+  const gi = $("#nGiong"); if (gi) gi.onchange = () => { c.giong = gi.value; save(); };
+  const tc = $("#nToc"); if (tc) tc.onchange = () => { c.toc = +tc.value; save(); };
+  v.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { noiStop(); N.p = +b.dataset.p; N.k = 0; N.res = null; N.show = false; drawNoi(true); });
+  if (c.m === "doan") return wireDoan();
+  const MC = D.lessons[S.ma].mau_cau, P = MC[N.p], tgt = P.drills[N.k];
+  const live = t => { const l = $("#nLive"); if (l) l.textContent = t; };
+  const startMic = () => {
+    if (c.kb){ const i = $("#nKb"); if (i) try { i.focus({preventScroll:true}); } catch(e){} return; }
+    const ok = listen(false, s => live(s ? "… " + s : "Đang nghe…"), (said, alts, err) => {
+      if (!said){ live(MICERR[err] || MICERR["no-speech"]); return; }
+      doneDrill(alts.concat([said]), said);
+    });
+    live(ok ? "Đang nghe… con nói đi!" : "Không bật được micrô. Thử lại, hoặc bật ⌨ Gõ phím.");
+  };
+  $("#nPlay").onclick = () => { noiStop(); speak(c.m === "nhac" ? tgt : (P.hoi || tgt), () => { if (c.auto && !c.kb && SRC) setTimeout(startMic, 200); }); };
+  const mb = $("#micBtn");
+  if (mb) mb.onclick = () => { if (REC){ REC._stop(); return; } noiStop(); startMic(); };
+  const kb = $("#nKb");
+  if (kb){
+    const go = () => { if (!kb.value.trim()){ kb.focus(); return; } doneDrill([kb.value], kb.value.trim()); };
+    $("#nKbGo").onclick = go; kb.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  }
+  const sh = $("#nShow"); if (sh) sh.onclick = () => { noiStop(); N.show = true; drawNoi(false); speak(tgt); };
+  $("#nPrev").onclick = () => noiStep(-1);
+  $("#nNext").onclick = () => noiStep(1);
+  if (play) $("#nPlay").click();
+}
+function doneDrill(cands, said){
+  const c = NC(), P = D.lessons[S.ma].mau_cau[N.p], tgt = P.drills[N.k];
+  const g = grade(tgt, cands); if (c.kb) g.said = said;
+  N.res = g; noiRec(noiKey(P, c.m, N.k), g.pct);
+  drawNoi(false);
+  const tok = N.tok;
+  if (g.pct < 100 && c.m === "thay") speak(tgt);                         // nghe lại câu đúng
+  if (g.pct >= 80 && c.auto && !c.kb){
+    const l = $("#nLive"); if (l) l.textContent = "Tự sang câu sau…";
+    N.timer = setTimeout(() => { if (tok === N.tok) noiStep(1); }, c.m === "thay" && g.pct < 100 ? 4000 : 2000);
+  }
+}
+function noiStep(d){
+  noiStop();
+  const MC = D.lessons[S.ma].mau_cau; let p = N.p, k = N.k + d;
+  if (k >= MC[p].drills.length){ p++; k = 0; if (p >= MC.length) return noiDone(); }
+  if (k < 0){ if (p === 0) k = 0; else { p--; k = MC[p].drills.length - 1; } }
+  N.p = p; N.k = k; N.res = null; N.show = false;
+  drawNoi(true); window.scrollTo({top: $("#view").offsetTop - 70, behavior: "smooth"});
+}
+function noiDone(){
+  const c = NC(), MC = D.lessons[S.ma].mau_cau, v = $("#view");
+  const cnt = m => MC.reduce((n, P) => n + P.drills.filter((_, k) => noiBest(noiKey(P, m, k)) >= 80).length, 0), all = MC.reduce((n, P) => n + P.drills.length, 0);
+  const nextM = c.m === "nhac" ? ["thay", "Sang Thay thế"] : ["doan", "Sang Tự nói đoạn"];
+  v.innerHTML = `<section class="card result"><div class="eyebrow">Xong một lượt luyện nói</div>
+    <h2 style="font-size:1.3rem">Con đã luyện hết ${MC.length} mẫu câu!</h2>
+    <div class="rep" style="width:100%;grid-template-columns:1fr 1fr">
+      <div class="tile"><span>Nghe – nhắc đạt</span><b>${cnt("nhac")}/${all}</b></div>
+      <div class="tile"><span>Thay thế đạt</span><b>${cnt("thay")}/${all}</b></div></div>
+    <p class="muted" style="margin:0;font-size:.9rem">Câu “đạt” là câu con nói đúng từ 80% trở lên. Ôn lại sau 1, 3 và 7 ngày.</p>
+    <div class="row" style="justify-content:center"><button class="btn" id="nGoNext">${nextM[1]}</button><button class="btn ghost" id="nAgain">Luyện lại từ đầu</button></div></section>`;
+  $("#nGoNext").onclick = () => { c.m = nextM[0]; N.p = 0; N.k = 0; N.res = null; save(); drawNoi(false); };
+  $("#nAgain").onclick = () => { N.p = 0; N.k = 0; N.res = null; drawNoi(true); };
+}
+function wireDoan(){
+  const c = NC(), MC = D.lessons[S.ma].mau_cau, lines = doanLines(MC);
+  const live = t => { const l = $("#nLive"); if (l) l.textContent = t; };
+  $("#dPlay").onclick = () => { noiStop(); const tok = N.tok; let i = 0; const nx = () => { if (tok !== N.tok || i >= lines.length) return; speak(lines[i++].s, () => setTimeout(nx, 350), tok); }; nx(); };
+  $("#dShow").onclick = () => { noiStop(); N.show = !N.show; N.res = null; drawNoi(false); };
+  $("#dNew").onclick = () => { noiStop(); N.pick = null; N.res = null; N.show = false; drawNoi(false); };
+  const fin = said => { const g = gradePara(lines, said); g.said = said; N.res = g; N.show = false; noiRec(`${S.ma}:doan:${c.cap}`, g.pct); drawNoi(false); };
+  const mb = $("#micBtn");
+  if (mb) mb.onclick = () => {
+    if (REC){ REC._stop(); return; }
+    noiStop(); N.res = null;
+    const ok = listen(true, s => live(s ? "… " + s : "Đang nghe… nói hết 5 câu rồi bấm ■ Xong"), (said, alts, err) => {
+      if (!said){ live(MICERR[err] || MICERR["no-speech"]); return; }
+      fin(said);
+    });
+    live(ok ? "Đang nghe… nói hết 5 câu rồi bấm ■ Xong" : "Không bật được micrô. Thử lại, hoặc bật ⌨ Gõ phím.");
+  };
+  const kb = $("#nKb");
+  if (kb) $("#nKbGo").onclick = () => { if (!kb.value.trim()){ kb.focus(); return; } fin(kb.value.trim()); };
+}
+
 /* ================= DỮ LIỆU: NHẬP EXCEL & LƯU ================= */
 const DB = {
   open(){ return new Promise((res, rej) => { const r = indexedDB.open("so-on-lop6", 1); r.onupgradeneeded = () => r.result.createObjectStore("kv"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); },
@@ -792,6 +1207,7 @@ const DB = {
   async del(k){ const db = await this.open(); return new Promise((res, rej) => { const t = db.transaction("kv", "readwrite"); t.objectStore("kv").delete(k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); }
 };
 const LSKEY = "so-on-lop6-data";
+const PV = 2;   // phiên bản bộ đọc Excel (2 = có trang MAU_CAU) → dữ liệu lưu bằng bộ đọc cũ sẽ được đọc lại
 async function loadSaved(){
   try { const v = await DB.get("data"); if (v && v.D) return v; } catch(e){}
   try { const raw = localStorage.getItem(LSKEY); if (raw) return JSON.parse(raw); } catch(e){}
@@ -906,6 +1322,16 @@ function parseBook(wb){
     q.id = uid(r.id, r.baima, "Q", X.cau_hoi.length+1); q._r = row;
     X.cau_hoi.push(q);
   });
+  const arr = v => { const t = String(v || "").trim(); if (!t) return []; if (t[0] === "["){ try { const j = JSON.parse(t); if (Array.isArray(j)) return j; } catch(e){} } return t.split(/\s*\|\s*/).filter(Boolean); };
+  (sheetRows(wb, "MAU_CAU") || []).forEach((r, i) => {
+    if (!r.baima) return; const X = get(r.baima, "MAU_CAU", i+2); if (!X) return;
+    const drills = arr(r.drills).map(x => String(x).trim()).filter(Boolean);
+    if (!r.maucau || !drills.length){ warn("MAU_CAU", i+2, "thiếu mau_cau hoặc drills, bỏ qua"); return; }
+    const grp = a => arr(a).map(x => Array.isArray(x) ? x.map(String) : String(x).split(/\s*\/\s*/));
+    X.mau_cau = X.mau_cau || [];
+    X.mau_cau.push({id: r.id || `${r.baima}-M${String(X.mau_cau.length+1).padStart(2,"0")}`, the_loai: r.theloai || "", mau: r.maucau, goi_mo: r.tugoimo || "", hoi: r.cauhoi || "", noi: r.tunoi || "",
+      tu: grp(r.tuthaythe), tu_vi: grp(r.dichtuthaythe), drills, vi: arr(r.dichdrills).map(String), ipa: arr(r.ipa).map(String)});
+  });
   Object.values(L).forEach(X => { X.tomtat.phan.sort((a,b) => a._o - b._o).forEach(p => delete p._o); });
   return {catalog:{parts}, lessons:L, warnings:W, bad:BAD};
 }
@@ -915,7 +1341,10 @@ function stats(d){
   return {mon:d.catalog.parts.length, bai:ls.length, tong:all, the:ls.reduce((n,l)=>n+l.the.length,0), cau:ls.reduce((n,l)=>n+l.cau_hoi.length,0)};
 }
 function useData(nd){
-  D = nd; reindex();
+  D = nd;
+  if (WANT && WANT.ma && (nd.lessons[WANT.ma] || (WANT.chap && WANT.ma === WANT.chap))){ S.ma = WANT.ma; S.chap = WANT.chap; if (WANT.mode) S.mode = WANT.mode; }
+  WANT = null;
+  reindex();
   $("#nReady").textContent = `đã có ${Object.keys(D.lessons).length} bài`;
   syncNav(); render();
   if (!$("#pickBox").hidden) drawPicker();
@@ -937,7 +1366,7 @@ function drawDataBox(extra){
   const sv = $("#saveData");
   if (sv) sv.onclick = async () => {
     sv.disabled = true;
-    const meta = {src:"saved", file:META.file, saved:Date.now()};
+    const meta = {src:"saved", file:META.file, saved:Date.now(), pv:PV};
     const ok = await storeSaved({D, meta});
     if (ok){ META = meta; drawDataBox(`<div class="okmsg">Đã lưu vào máy này. Lần sau mở app sẽ tự dùng dữ liệu này, không cần nhập lại.</div>`); }
     else { sv.disabled = false; drawDataBox(`<div class="errmsg">Trình duyệt này không cho lưu (có thể đang ở chế độ ẩn danh). Hãy mở app bằng cửa sổ thường rồi thử lại.</div>`); }
@@ -990,7 +1419,7 @@ $("#dataClose").onclick = () => toggleData(false);
 /* ================= XEM & CHỌN DÒNG ================= */
 const PK = {tab:"cau", mon:"", chuong:"", bai:"", muc:"", dang:"", q:"", onlyOff:false, limit:100};
 const DGL = {trac_nghiem:"Trắc nghiệm", dung_sai:"Đúng/Sai", dien_khuyet:"Điền khuyết", noi_cap:"Nối cặp"};
-const TABS = [["cau","Câu hỏi","CAU_HOI"],["the","Thẻ nhớ","THE_NHO"],["dm","Danh mục","DANH_MUC"],["tt","Tóm tắt","TOM_TAT"],["nd","Nội dung","NOI_DUNG"],["cn","Cần nhớ","CAN_NHO"],["tk","Tự kiểm tra","TU_KIEM_TRA"]];
+const TABS = [["cau","Câu hỏi","CAU_HOI"],["the","Thẻ nhớ","THE_NHO"],["dm","Danh mục","DANH_MUC"],["tt","Tóm tắt","TOM_TAT"],["nd","Nội dung","NOI_DUNG"],["cn","Cần nhớ","CAN_NHO"],["tk","Tự kiểm tra","TU_KIEM_TRA"],["mc","Mẫu câu","MAU_CAU"]];
 const monOf = bai => { const c = CHAPS[B2C[bai]]; return c ? c.part : ""; };
 const nameOf = bai => { const c = CHAPS[B2C[bai]]; const b = c && c.bai.find(x => x[0] === bai); return b ? b[1] : bai; };
 /* dòng của từng trang, dựng lại từ dữ liệu đang dùng */
@@ -1014,11 +1443,13 @@ function sheetData(tab){
     each((ma, L) => { (L.tomtat.so_lieu||[]).forEach(x => out.push({bai:ma, cells:[ma, "so_lieu", x[0], x[1]]})); (L.tomtat.moc||[]).forEach(x => out.push({bai:ma, cells:[ma, "moc", x[0], x[1]]})); });
   } else if (tab === "tk"){
     each((ma, L) => (L.tomtat.tu_kiem_tra||[]).forEach(q => out.push({bai:ma, cells:[ma, q.hoi, q.dap]})));
+  } else if (tab === "mc"){
+    each((ma, L) => (L.mau_cau||[]).forEach(m => out.push({bai:ma, cells:[ma, m.the_loai, m.mau, m.hoi, m.noi, m.drills.join(" | ")]})));
   }
   out.forEach(o => { o.search = norm((o.text || "") + " " + (o.cells || []).join(" ")); });
   return out;
 }
-const HEAD = {dm:["Môn","Chương","Mã bài","Tên bài","Trạng thái"], tt:["Mã bài","Tiêu đề","Nguồn","Mục tiêu","Lỗi hay gặp","Công cụ"], nd:["Mã bài","STT","Tiêu đề mục","Các ý"], cn:["Mã bài","Loại","Nhãn","Giá trị"], tk:["Mã bài","Câu hỏi","Đáp án"]};
+const HEAD = {dm:["Môn","Chương","Mã bài","Tên bài","Trạng thái"], tt:["Mã bài","Tiêu đề","Nguồn","Mục tiêu","Lỗi hay gặp","Công cụ"], nd:["Mã bài","STT","Tiêu đề mục","Các ý"], cn:["Mã bài","Loại","Nhãn","Giá trị"], tk:["Mã bài","Câu hỏi","Đáp án"], mc:["Mã bài","Thể loại","Mẫu câu","Câu hỏi","Từ nối","5 câu thay thế"]};
 function filtered(rows){
   const q = norm(PK.q);
   return rows.filter(o => {
@@ -1117,13 +1548,13 @@ function autoBook(){
     const wb = XLSX.read(A.b64, {type:"base64"});
     const d = parseBook(wb);
     if (!Object.keys(d.lessons).length) return null;
-    return {D:{catalog:d.catalog, lessons:d.lessons, bad:d.bad}, meta:{src:"saved", file:A.file || "Excel", saved:Date.now(), auto:A.time || 0}};
+    return {D:{catalog:d.catalog, lessons:d.lessons, bad:d.bad}, meta:{src:"saved", file:A.file || "Excel", saved:Date.now(), auto:A.time || 0, pv:PV}};
   } catch(e){ return null; }
 }
 loadSaved().then(async v => {
   const A = window.SO_ON_AUTO;
   const old = v && v.meta && v.meta.auto || 0;
-  if (A && A.time && (!v || A.time > old)){
+  if (A && A.time && (!v || A.time > old || ((v.meta && v.meta.pv) || 1) < PV)){
     const n = autoBook();
     if (n){ META = n.meta; useData(n.D); await storeSaved(n); if (!$("#dataBox").hidden) drawDataBox(); return; }
   }
@@ -1156,6 +1587,7 @@ function mergeS(a, b){
   o.stars = Math.max(a.stars || 0, b.stars || 0);
   if ((a.lastDay || 0) !== (b.lastDay || 0)){ const x = (a.lastDay || 0) > (b.lastDay || 0) ? a : b; o.lastDay = x.lastDay; o.streak = x.streak || 1; }
   else { o.lastDay = a.lastDay; o.streak = Math.max(a.streak || 1, b.streak || 1); }
+  o.noi = mergeNoi(a.noi, b.noi, n);
   o.cards = Object.assign({}, a.cards || {});
   const bc = b.cards || {};
   for (const id in bc){
