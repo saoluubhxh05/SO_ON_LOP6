@@ -98,6 +98,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .chap{border:2px solid var(--line);background:var(--surface);border-radius:999px;min-height:40px;min-width:52px;padding:4px 12px;font-weight:700;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:6px}
 .ncsep{align-self:center;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--bronze);padding:0 4px 0 8px;border-left:2px solid var(--line);margin-left:4px}
 .chap.nc{border-style:dashed}
+.chap.np{border-style:dotted}
 .gbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 10px}
 .gbar .glab{font-size:.8rem;font-weight:700;color:var(--muted);margin-right:2px}
 .gchip{border:2px solid var(--line);background:var(--surface);border-radius:999px;min-height:36px;padding:3px 12px;font-weight:600;font-size:.85rem;color:var(--ink)}
@@ -460,6 +461,9 @@ let WANT = {ma:S.ma, chap:S.chap, mode:S.mode};   // bài đang học lúc mở 
 const ready = c => c.bai.filter(b => D.lessons[b[0]]);
 const isChap = ma => !!CHAPS[ma];
 const chapOf = ma => isChap(ma) ? CHAPS[ma] : CHAPS[B2C[ma]];
+/* ---------- Ngữ pháp nâng cao (chương ANH-NP-…): xem theo sách Grammar in Use hoặc theo Unit SGK ---------- */
+const isNP = c => !!c && /^ANH-NP-/.test(c.ma);
+const npSgk = b => String(b[2] || "").split(/[,;\s]+/).filter(Boolean);
 function reindex(){
   CHAPS = {}; B2C = {};
   D.catalog.parts.forEach(p => p.chuong.forEach(c => { c.part = p.key; CHAPS[c.ma] = c; c.bai.forEach(b => { B2C[b[0]] = c.ma; }); }));
@@ -479,8 +483,8 @@ function basePool(){
 }
 const lesson = pool;
 /* ---------- Tiếng Anh: chia theo phần (Từ vựng → Ngữ pháp → Mẫu câu → Phát âm → Giao tiếp → Đọc hiểu), không trộn lẫn ---------- */
-const GORD = ["Từ vựng","Ngữ pháp","Mẫu câu","Phát âm","Giao tiếp","Đọc hiểu","Nghe","Viết"];
-const GMAP = {tuvung:"Từ vựng", nguphap:"Ngữ pháp", maucau:"Mẫu câu", phatam:"Phát âm", giaotiep:"Giao tiếp", dochieu:"Đọc hiểu", nghe:"Nghe", viet:"Viết", nghehieu:"Nghe"};
+const GORD = ["Từ vựng","Ngữ pháp","Cấu trúc","Dấu hiệu","Phân biệt","Lỗi hay gặp","Mẫu câu","Phát âm","Giao tiếp","Đọc hiểu","Nghe","Viết"];
+const GMAP = {cautruc:"Cấu trúc", dauhieu:"Dấu hiệu", phanbiet:"Phân biệt", loisai:"Lỗi hay gặp", tuvung:"Từ vựng", nguphap:"Ngữ pháp", maucau:"Mẫu câu", phatam:"Phát âm", giaotiep:"Giao tiếp", dochieu:"Đọc hiểu", nghe:"Nghe", viet:"Viết", nghehieu:"Nghe"};
 function grpOf(x){ const raw = String((x && (x.ky_nang || x.loai)) || "").trim(); return GMAP[norm(raw).replace(/-/g,"")] || raw || "Khác"; }
 const gIdx = g => { const i = GORD.indexOf(g); return i < 0 ? (g === "Khác" ? 99 : 50) : i; };
 function isAnhNow(){ const c = S.ma && chapOf(S.ma); return !!c && isAnh(D.catalog.parts.find(p => p.key === c.part)); }
@@ -536,18 +540,24 @@ function pickChap(cm){
 function syncNav(){
   const ch = CHAPS[S.chap], part = D.catalog.parts.find(p => p.key === ch.part);
   $("#parts").innerHTML = D.catalog.parts.map(p => `<button class="part ${p.chuong.some(c=>ready(c).length)?"":"empty"}" data-part="${p.key}" aria-pressed="${p.key===part.key}">${esc(p.ten)}</button>`).join("");
-  let ci = 0, sep = false;
-  $("#chaps").innerHTML = part.chuong.map(c => {
-    const lab = c.nc ? `NC${c.nc}` : `C${++ci}`, pre = c.nc && !sep ? (sep = true, `<span class="ncsep">Nâng cao</span>`) : "";
-    return `${pre}<button class="chap ${c.nc?"nc":""} ${ready(c).length?"has":""}" data-chap="${c.ma}" aria-pressed="${c.ma===S.chap}" title="${esc(c.ten)}"><span class="dot"></span>${lab}</button>`;
+  let ci = 0, ni = 0, sep = false, npsep = false;
+  const shown = part.chuong.filter(c => !isNP(c)).concat(part.chuong.filter(isNP));
+  $("#chaps").innerHTML = shown.map(c => {
+    const np = isNP(c);
+    const lab = np ? `NP${++ni}` : c.nc ? `NC${c.nc}` : `C${++ci}`;
+    let pre = "";
+    if (c.nc && !np && !sep){ sep = true; pre = `<span class="ncsep">Nâng cao</span>`; }
+    if (np && !npsep){ npsep = true; pre = `<span class="ncsep" title="Xếp theo sách English Grammar in Use (145 unit)">Ngữ pháp · Grammar in Use</span>`; }
+    return `${pre}<button class="chap ${c.nc?"nc":""} ${np?"np":""} ${ready(c).length?"has":""}" data-chap="${c.ma}" aria-pressed="${c.ma===S.chap}" title="${esc(c.ten)}"><span class="dot"></span>${lab}</button>`;
   }).join("");
   const r = ready(ch);
   $("#chapInfo").innerHTML = `${esc(ch.ten)}<small>${ch.bai.length ? `Đã có ${r.length}/${ch.bai.length} bài` : "Chương này đang được soạn"}</small>`;
   let h = "";
   if (r.length > 1) h += `<button class="lesson whole" data-ma="${ch.ma}" aria-pressed="${S.ma===ch.ma}"><small>Ôn cả chương · ${r.length} bài</small><b>Trộn thẻ nhớ và câu hỏi của cả chương</b></button>`;
+  const npTag = b => { if (!isNP(ch)) return ""; const u = npSgk(b).map(x => (/(\d+)/.exec(x) || [,x])[1]); return u.length ? ` · ★ SGK Unit ${u.map(Number).join(", ")}` : ""; };
   h += ch.bai.map(b => D.lessons[b[0]]
-    ? `<button class="lesson" data-ma="${b[0]}" aria-pressed="${S.ma===b[0]}"><small>${esc(labelOf(b[1])[0])}</small><b>${esc(labelOf(b[1])[1])}</b></button>`
-    : `<button class="lesson soon" disabled><small>${esc(labelOf(b[1])[0])} · đang soạn</small><b>${esc(labelOf(b[1])[1])}</b></button>`).join("");
+    ? `<button class="lesson" data-ma="${b[0]}" aria-pressed="${S.ma===b[0]}"><small>${esc(labelOf(b[1])[0] + npTag(b))}</small><b>${esc(labelOf(b[1])[1])}</b></button>`
+    : `<button class="lesson soon" disabled><small>${esc(labelOf(b[1])[0] + npTag(b))} · đang soạn</small><b>${esc(labelOf(b[1])[1])}</b></button>`).join("");
   $("#lessons").innerHTML = h;
   document.querySelectorAll(".part").forEach(b => b.onclick = () => {
     const p = D.catalog.parts.find(x => x.key === b.dataset.part);
@@ -1304,7 +1314,7 @@ const DB = {
   async del(k){ const db = await this.open(); return new Promise((res, rej) => { const t = db.transaction("kv", "readwrite"); t.objectStore("kv").delete(k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); }
 };
 const LSKEY = "so-on-lop6-data";
-const PV = 3;   // phiên bản bộ đọc Excel (2 = có trang MAU_CAU, 3 = có cột ky_nang) → dữ liệu lưu bằng bộ đọc cũ sẽ được đọc lại
+const PV = 4;   // phiên bản bộ đọc Excel (2 = có trang MAU_CAU, 3 = có cột ky_nang) → dữ liệu lưu bằng bộ đọc cũ sẽ được đọc lại
 async function loadSaved(){
   try { const v = await DB.get("data"); if (v && v.D) return v; } catch(e){}
   try { const raw = localStorage.getItem(LSKEY); if (raw) return JSON.parse(raw); } catch(e){}
@@ -1345,11 +1355,11 @@ function parseBook(wb){
     if (BT[r.baima]){ warn("DANH_MUC", row, `trùng mã bài ${r.baima}, bỏ qua`); return; }
     let p = P[r.monma]; if (!p){ p = P[r.monma] = {key:r.monma, ten:r.monten || r.monma, chuong:[]}; parts.push(p); }
     let c = CH[r.chuongma]; if (!c){ c = CH[r.chuongma] = {ma:r.chuongma, ten:r.chuongten || r.chuongma, bai:[]}; p.chuong.push(c); }
-    c.bai.push([r.baima, r.baiten || r.baima, parseFloat(r.thutu) || c.bai.length + 1]);
+    c.bai.push([r.baima, r.baiten || r.baima, parseFloat(r.thutu) || c.bai.length + 1, r.unitsgk || ""]);
     BT[r.baima] = {mon:p.ten, ten:r.baiten || r.baima};
   });
   if (!parts.length) throw new Error("Trang DANH_MUC chưa có bài nào.");
-  parts.forEach(p => p.chuong.forEach(c => { c.bai.sort((a,b) => a[2] - b[2]); c.bai = c.bai.map(b => [b[0], b[1]]); }));
+  parts.forEach(p => p.chuong.forEach(c => { c.bai.sort((a,b) => a[2] - b[2]); c.bai = c.bai.map(b => b[3] ? [b[0], b[1], b[3]] : [b[0], b[1]]); }));
 
   const L = {};
   const get = (ma, sh, row, r) => {
