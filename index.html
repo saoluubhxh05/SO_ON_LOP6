@@ -895,6 +895,12 @@ function correctText(q){
   if (q.dang === "dien_khuyet") return q.dap_an[0];
   return q.cap.map((c,i)=>`${i+1}. ${c[0]} → ${c[1]}`).join(" · ");
 }
+function giuViTri(y){
+  /* Câu tiếp theo: giữ màn hình ở khung câu hỏi, không nhảy lên đầu trang (sửa 06/11) */
+  const v = $("#view"); if (!v) return;
+  const top = v.getBoundingClientRect().top + window.scrollY - 70;
+  window.scrollTo({top: Math.max(0, Math.min(y, top)), behavior: "auto"});
+}
 function finish(q, ok, shown){
   Q.answers.push({q, ok, shown});
   const next = Q.i + 1 >= Q.list.length ? "Xem kết quả" : "Câu tiếp theo";
@@ -904,7 +910,7 @@ function finish(q, ok, shown){
   }
   const hb = $("#hintBtn"); if (hb) hb.remove();
   $("#ctrl").insertAdjacentHTML("beforeend", `<button class="btn" id="nextBtn">${next}</button>`);
-  const nb = $("#nextBtn"); nb.onclick = () => { Q.i++; drawQ(); window.scrollTo({top:0, behavior:"smooth"}); };
+  const nb = $("#nextBtn"); nb.onclick = () => { const y = window.scrollY; Q.i++; drawQ(); giuViTri(y); };
   if (Q.kind === "kiemtra") nb.click(); else try { nb.focus({preventScroll:true}); } catch(e){}
 }
 function gResult(){
